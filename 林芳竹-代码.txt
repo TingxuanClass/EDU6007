@@ -1,0 +1,53 @@
+install.packages("beanplot")
+## 创建三组数据，分别为双峰，均匀和正态分布
+data1=bimodal <- c(rnorm(250, -2, 0.6), rnorm(250, 2, 0.6))
+data2=uniform <- runif(500, -4, 4)
+data3=normal <- rnorm(500, 0, 1.5)
+par(mfrow = c(1,2))
+## 制作箱型图
+data<- data.frame(data1,data2,data3)
+boxplot(data, col=c("red", "blue", "purple"))
+## 制作豆荚图
+beanplot(bimodal, uniform, normal, # 注明用于作图的三组数据
+   main = "Beanplot", # 题目
+   col = c("#CAB2D6", "#33A02C", "#B2DF8A"), # 修改颜色：分布，豆荚内横线，豆荚外横线
+   border = "#CAB2D6") # 豆荚图的边缘颜色
+mydata=read.csv(file="C:/Users/Administrator/Desktop/data8.csv")
+## 分类变量转为factor
+mydata<-within(mydata,{
+gender<-factor(class)
+major<-factor(major)
+})
+## 制作豆荚图
+beanplot(grade ~major, # 可以使用熟悉的模式: y ~ x
+   data = mydata, # 数据
+   ll = 0.04, main = "Beanplot", # 题目
+   ylab = "grade", # y轴标签
+   col =c("darkorange","darkorange"), # 改变豆荚内的分布颜色
+   border = NA,horizontal =F)
+par(mfrow = c(1,2))
+## 制作对比豆荚图（前后测）
+beanplot(grade ~ reorder(class, grade, mean) * major, mydata,
+   ##（二层分类变量，连续变量，均值）*一层分类变量
+   ll = 0.04,main = "beanplot",
+   ylab = "grade", side= "both",
+   border = NA,horizontal = F,
+   col = list(c("darkorange","darkorange"),c("yellow","yellow")))
+## 添加图例
+legend("bottomright", bty="n",c("pre-test", "test"),
+   fill = c("orange", "yellow"))
+## 对比箱型图（前后测）
+boxplot(grade ~ major, data = mydata,
+   boxwex = 0.15,## 箱子宽窄
+   at= 1:3 - 0.2,##两个箱子的相对位置
+   subset = class == 0, ##提取不同类型
+   col = "orange",
+   main = "boxplot",
+   xlab = "major",
+   ylab = "grade", ylim = c(40, 100),yaxs = "i")
+boxplot(grade ~ major, data = mydata, add = TRUE,
+   boxwex = 0.15, at = 1:3 + 0.2,
+   subset = class == 1, col = "yellow")
+legend("bottomright", bty="n",c("pre-test", "test"),
+   fill = c("orange", "yellow"))
+

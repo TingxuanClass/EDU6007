@@ -1,0 +1,75 @@
+###### 需要安装并加载程序包：ggpmisc、ggplot2、gghighlight
+##### 1.绘制残差residual
+#### 安装并加载程序包ggpmisc用以绘制残差
+### 读入数据
+data=read.csv(file="C:/Users/Monica/Desktop/data.csv") ## 请将文件路径根据自己电脑存储的情况进行修改
+data
+### 简单了解data数据集
+dim(data)
+head(data)
+summary(data)
+### 用data数据集绘制散点图
+p <- ggplot(data, aes(GPA, CET6)) + ## 初始化图形，设置数据源为data，作图变量为GPA和CET6
+   geom_point(color = "dark green", size = 3) + ## 设置点的填充颜色和填充大小
+   geom_smooth(method = "lm", se = FALSE, color = "red", size = 1) +
+   ## 在散点图中添加拟合曲线，设置曲线的统计算法（method参数）、误差范围的颜色带（se，默认为TRUE）、颜色和粗细
+   theme_bw()
+   ## 设置散点图的背景主题、横纵坐标轴和网格线。如theme_bw()；theme_classic();theme_minimal()等。
+p
+### 绘制残差
+p + stat_fit_deviations(color = "blue",size=0.5)
+———————————————————————————————————————————
+##### 2.绘制密度图density plot
+#### 安装并加载程序包ggplot2，继续使用data数据集
+### 以GPA列的数据绘制密度图
+ggplot(data, aes(GPA)) + ## aes中的参数即为作图变量
+   geom_density()
+### 调整带宽bandwidth，并加上标题title
+ggplot(data, aes(GPA)) +
+   geom_density(adjust = 1/4) + ## 调带宽，adjust参数默认为1
+   ggtitle("bandwidth = 1/4") ## 加标题
+### 根据grade的不同，了解GPA在各个年级中的分布
+ggplot(data, aes(GPA, fill = grade)) +
+   geom_density(adjust = 1)+
+   ggtitle("bandwidth = 1")
+### 调整填充颜色的透明度和边界线的颜色
+ggplot(data, aes(GPA, fill = grade)) +
+   geom_density(adjust = 1, alpha = 0.5, color = "red")+ ## 调整透明度alpha为0.5，边界线颜色color为红色
+   ggtitle("bandwidth = 1") +
+   theme_classic()
+———————————————————————————————————————————
+##### 3.高亮部分点或区域highlight
+#### 安装并加载程序包gghighlight，继续使用data数据集
+### 用data数据集绘制散点图
+ggplot(data) +
+   geom_point(aes(GPA, CET6, colour = grade))
+### 高亮CET6=448的点
+ggplot(data) +
+   geom_point(aes(GPA, CET6, colour = grade)) +
+   gghighlight(CET6 == 448) ## 高亮
+### 去除散点图上的标签，改用图例进行注释
+ggplot(data) +
+   geom_point(aes(GPA, CET6, colour = grade)) +
+   gghighlight(CET6 == 448,
+   use_direct_label = FALSE) ## 使用legend注释
+### 以grade为划分依据，分别高亮散点图中三个年级的数据
+ggplot(data, aes(GPA, CET6, colour = grade)) +
+   geom_point() +
+   gghighlight() + ## 高亮
+   facet_grid(.~ grade) ## 横向罗列
+ggplot(data, aes(GPA, CET6, colour = grade)) +
+   geom_point() +
+   gghighlight() + ## 高亮
+   facet_grid(grade ~.) ## 纵向罗列
+### 以grade为划分依据，分别高亮密度图中三个年级的数据
+ggplot(data, aes(GPA, fill = grade)) +
+   geom_density(alpha = 0.5, color = "red") +
+   gghighlight() +
+   facet_grid(.~ grade) + ## 横向罗列
+   theme_minimal()
+ggplot(data, aes(GPA, fill = grade)) +
+   geom_density(alpha = 0.5, color = "red") +
+   gghighlight() +
+   facet_grid(grade ~.) + ## 纵向罗列
+   theme_minimal()
+

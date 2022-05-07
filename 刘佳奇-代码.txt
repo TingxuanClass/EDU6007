@@ -1,0 +1,110 @@
+###ggcorrplot具有重新排序相关矩阵以及在热图上显示显著性水平的功能。
+###此外，它还包括用于计算相关性p值的矩阵的功能。
+#ggcorrplot的下载与安装
+install.packages("ggcorrplot")
+library(ggcorrplot)
+data(mtcars)
+
+### Rename the variables in the dataset
+mtcars=mtcars[,c(1:5)]
+### Rename the variables in the dataset
+colnames(mtcars)[colnames(mtcars)== "mpg"]="English_Test_Score"
+colnames(mtcars)[colnames(mtcars)== "cyl"]="Number_of_Books"
+colnames(mtcars)[colnames(mtcars)== "disp"]="Math_Test_Score"
+colnames(mtcars)[colnames(mtcars)== "drat"]="GPA"
+colnames(mtcars)[colnames(mtcars)== "hp"]="Attitude_Score"
+
+
+corr <- round(cor(mtcars), 1) #计算相关性。格式设置，仅保留1位小数。
+head(corr[, 1:6])
+# 计算相关性矩阵的P值
+p.mat <- cor_pmat(mtcars)
+head(p.mat[, 1:4])
+#可视化相关矩阵
+#默认作图，method = "square"
+ggcorrplot(corr)
+#重排矩阵，使用分等级聚类
+ggcorrplot(corr, hc.order = TRUE, outline.color = "white")
+# 调整矩形热图为圆形，method = "circle"
+ggcorrplot(corr, method = "circle")
+#获取下三角形
+ggcorrplot(corr, hc.order = TRUE, type = "lower",
+           outline.col = "white")
+#上三角形
+ggcorrplot(corr, hc.order = TRUE, type = "upper",
+           outline.col = "white")
+#更改颜色和主题
+ggcorrplot(corr, hc.order = TRUE, type = "lower",
+           outline.col = "white",
+           ggtheme = ggplot2::theme_void,
+           colors = c("#6D9EC1", "white", "#E46726")) 
+#ggtheme：主题设置，更多颜色搭配可以借助一些配色网站 ，如coolors。
+#添加相关系数lab = true
+ggcorrplot(corr, hc.order = TRUE, type = "lower",
+           lab = TRUE)
+#添加相关性显著水平
+#参数 p.mat.
+#默认叉掉不显著的系数
+ggcorrplot(corr, hc.order = TRUE,
+           type = "lower", p.mat = p.mat,sig.level = 0.05)
+#留空不显著的系数
+ggcorrplot(corr, p.mat = p.mat, hc.order = TRUE,
+           type = "lower", insig = "blank",sig.level = 0.05)
+
+
+###树状图
+install.packages("vtree") # 安装
+library(vtree)            # 载入
+data(FakeData)
+
+
+#### Rename the levels in the categorical variable
+levels(FakeData$Severity) <- c('Low', 'Medium', 'High')
+levels(FakeData$Sex) <- c('Low', 'High')
+
+#### Rename variables in the dataset
+colnames(FakeData)[colnames(FakeData)== "Severity"]="Prior_Knowledge"
+colnames(FakeData)[colnames(FakeData)== "Group"]="School"
+colnames(FakeData)[colnames(FakeData)== "Sex"]="SES"
+
+
+vtree(FakeData,"Prior_Knowledge")
+vtree(FakeData,        # 数据
+      "Prior_Knowledge SES",  # 两个分类变量，中间为空格
+      horiz = FALSE)   # 让变量树的形状变为“垂直”
+
+library(dplyr)   # 需提前安装install.packages("dplyr")
+
+vtree(FakeData,
+      "Score<9 SES")   # 9为Score的中位数
+
+###对变量树进行修建
+vtree(FakeData,
+      "School Prior_Knowledge SES",
+      horiz = FALSE)
+
+vtree(FakeData,
+      "School Prior_Knowledge SES",
+      keep = list(School = "A",
+                  Prior_Knowledge = "Moderate",
+                  SES = "Low")
+
+###流程图
+
+data(FakeRCT)
+head(FakeRCT)
+
+colnames(FakeRCT)[colnames(FakeRCT)== "eligible"]="All_Students"
+
+vtree(FakeRCT,
+      "All_Students randomized group followup analyzed", # 指定四个变量
+      plain = TRUE, # 颜色
+      follow = list(All_Students = "Eligible", # follow：指定相应的组别
+                    randomized = "Randomized",
+                    followup = "Followed up"),
+      horiz = FALSE, # 垂直，即箭头从上到下
+      showvarnames = FALSE, # 不显示变量名
+      title = "All Students") # 流程图题目
+
+
+

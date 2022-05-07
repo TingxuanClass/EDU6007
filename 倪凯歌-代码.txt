@@ -1,0 +1,28 @@
+#一行代码出回归表格
+install.packages("flextable")
+library(flextable)
+summary(mtcars) #使用系统自带的mtcars数据集
+mymodel <- lm(mpg ~ vs * hp * wt, data = mtcars)
+#建立回归模型，使用mpg作为因变量，vs, hp, wt作为自变量，并且添加它们间所有的交互项
+summary(mymodel)
+as_flextable(mymodel) #一步出回归表格
+#UpSetR：集合可视化神包
+install.packages("UpSetR")
+library(UpSetR)
+movies <- read.csv(system.file("extdata", "movies.csv", package = "UpSetR"), header = TRUE, sep = ";") #使用系统自带的movies数据集
+upset(movies, main.bar.color = "black", queries = list(list(query = intersects,
+   params = list("Drama"), color = "red", active = F), list(query = intersects,
+   params = list("Action", "Drama"), active = T), list(query = intersects,
+   params = list("Drama", "Comedy", "Action"), color = "orange", active = T)),
+   attribute.plots = list(gridrows = 45, plots = list(list(plot = scatter_plot,
+   x = "ReleaseDate", y = "AvgRating", queries = T), list(plot = scatter_plot,
+   x = "AvgRating", y = "Watches", queries = F)), ncols = 2), query.legend = "bottom")
+#重要参数解释（参考https://www.jianshu.com/p/0190fdd552fa）
+queries参数分为四个部分：query, param, color, active.
+•	query: 指定哪个query，UpSetR有内置的，也可以自定义，说到底就是一个查询函数
+•	param: list, query作用于哪个交集
+•	color：每个query都是一个list，里面可以设置颜色,没设置的话将调用包里默认的调色板
+•	active：被指定的条形图是否需要颜色覆盖，TRUE的话显示颜色，FALSE的话则在条形图顶端显示三角形
+参数attribute.plots主要是用于添加属性图，内置有柱形图、散点图、热图等
+#出来的图分为三个部分：主体部分呈现了各种类型的电影数量，许多电影往往不只属于一种类型，如一部电影既可能是剧情片，也可能是动作片，而UpSetR这一集合可视化神包能比较清晰地呈现各类电影；主体部分下面的两个图是通过attribute.plots参数得到的属性图，左下角的图呈现了剧情片、动作/剧情片、剧情/喜剧/动作片三类电影其上映时间和评分之间的关系，右下角的图则呈现了剧情片的评分与观看人数之间的关系。
+

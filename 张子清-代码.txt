@@ -1,0 +1,136 @@
+# 安装与加载“tidyverse”程序包
+
+install.packages("tidyverse")
+library(tidyverse)
+
+ 
+
+# 创建数据框
+
+data <- data.frame(
+id=seq(1,60), #按照顺序生成“1-60”
+individual=paste("Student ", seq(1,60), sep=""), #按照顺序生成“Student 1-60” sep表示不分隔
+value=sample(seq(10,100), 60, replace=T) #replace=T表示放回抽样 可以使用每个省份的某个指标（例如六级通过率）进行事先排序和数据对比
+)
+
+##制图（环形柱状图circular barplot 无标签）
+
+p <- ggplot(data, aes(x=as.factor(id), y=value)) + #这里id作为因子变量而不是数字变量
+geom_bar(stat="identity", fill=alpha("blue", 0.3)) + #stat="identity"表示1个x对于1个y alpha设置透明度
+ylim(-100,120) + #调节大小
+theme_minimal() + #内置主题
+theme(
+axis.text = element_blank(),
+axis.title = element_blank(),
+panel.grid = element_blank(),
+plot.margin = unit(rep(-2,4), "cm") #调节边界值
+) +
+coord_polar(start = 0) #coord_polar表示极坐标 start表示坐标开始的角度是0°
+p #缺少一些必要标签
+
+##为标签创建数据框
+
+label_data <- data #把data的数据框赋给标签的数据框
+
+##为标签来计算角度
+
+number_of_bar <- nrow(label_data) #计算标签数据框的行数
+angle <- 90 - 360 * (label_data$id-0.5) / number_of_bar #计算每个id所在行对应的角度
+label_data$hjust <- ifelse(angle < -90, 1, 0) #计算标签的对齐方式是左对齐还是右对齐
+label_data$angle <- ifelse(angle < -90, angle+180, angle) #调整角度
+
+ 
+
+# 制图（环形柱状图circular barplot 有标签）
+
+p <- ggplot(data, aes(x=as.factor(id), y=value)) +
+geom_bar(stat="identity", fill=alpha("blue", 0.3)) +
+ylim(-100,120) +
+theme_minimal() +
+theme(
+axis.text = element_blank(),
+axis.title = element_blank(),
+panel.grid = element_blank(),
+plot.margin = unit(rep(-1,4), "cm")
+) +
+coord_polar(start = 0) +
+geom_text( #增加标签
+data=label_data,
+aes(x=id, y=value+10, label=individual, hjust=hjust), #label换成value就显示值
+color = "black",
+fontface = "bold",
+alpha = 0.6,
+size = 2.5,
+angle = label_data$angle,
+inherit.aes = FALSE
+)
+
+p
+
+
+
+#####
+
+# 安装包的安装与加载
+
+install.packages("ggplot2")
+
+install.packages("av")
+
+install.packages("gganimate")
+
+library(ggplot2)
+
+library(av)
+
+library(gganimate)
+
+data(iris)
+
+### Change the variables names in a dataset
+ colnames(iris)[colnames(iris)== "Species"]="District"
+ colnames(iris)[colnames(iris)== "Sepal.Length"]= "Math_Score"
+ colnames(iris)[colnames(iris)== "Petal.Length"]= "English_Score"
+ colnames(iris)[colnames(iris)== "Petal.Width"]= "Science_Score"
+
+###Change the levels of a categorical variable
+ levels(iris$District) <- c('A', 'B', 'C')
+ head(iris)
+
+
+# 绘制静态图（使用“ggplot2”程序包）
+
+p <- ggplot(iris, aes(x = Science_Score, y = English_Score)) +
+geom_point()   ## geom_point()表示默认主题风格 
+
+
+
+plot(p)
+
+ 
+
+# 绘制动态图（使用“gganimate”程序包）
+
+anim <- p + transition_states(
+District,  ## 进行转化的各组数据
+transition_length = 2,  ## 各组之间转化的相对速度
+state_length = 1  ## 每个动画暂停的相对速度
+)
+
+anim
+
+
+# 在动态图基础上增加每组的颜色和进出特效
+
+anim <- ggplot(iris, aes(x =Science_Score, y = English_Score)) +
+geom_point(aes(colour = District), size = 2) +
+transition_states(District, transition_length = 2, state_length = 1)
+anim + enter_fade()+ exit_shrink()
+
+# 保存为视频（使用“av”程序包）
+
+animate(anim +
+enter_fade() +
+exit_fly(y_loc = 1), ## y_loc=1表示以所有点落到纵坐标=1位置的方式消失
+renderer = av_renderer()   ### av_renderer表示保存为视频
+)

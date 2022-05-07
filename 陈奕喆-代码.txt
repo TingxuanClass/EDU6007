@@ -1,0 +1,50 @@
+##绘制山脉图
+#安装包“ggplot2”和“ggridges”
+
+#读取数据
+data1=read.csv(file="G:/交大/研一/教育统计与计量/数据1.csv")
+data1
+
+ggplot(data1, aes(time.min, subject)) + #连续变量“时长”写在前，分类变量“学科”写在后
+   geom_density_ridges() + 
+   theme_ridges()
+
+#给不同组别添加不同颜色
+#增加了fill=subject，代表按照各学科添上不同颜色
+ggplot(data1, aes(time.min, subject,fill=subject)) + 
+   geom_density_ridges() + 
+   theme_ridges()
+
+#添加原始数据点
+ggplot(data1, aes(time.min, subject,fill=subject)) + 
+   geom_density_ridges(aes(point_color = subject),
+   jittered_points = TRUE, alpha = 0.3, point_alpha = 1)#jittered_points = TRUE表示添加原始数据点
+ + theme_ridges()
+
+———————————————————————————————————————
+
+##条形图及其变体
+#安装包“ggplot2”
+
+#读取数据
+data2=read.csv(file="G:/交大/研一/教育统计与计量/数据2.csv")
+data2
+
+#分组条形图
+ggplot(data, aes(fill=behavior, y=time.min., x=subject)) + 
+    geom_bar(position="dodge", stat="identity")
+#stat参数表示对样本点做统计的方式，默认为identity，表示一个x对应一个y，同时还可以是bin，表示一个x对应落到该x的样本数。说白了就是，identity提取横坐标x对应的y值，bin提取横坐标x的频数。
+
+
+#堆积条形图
+#唯一的变化就是把position的参数切换为“stack"
+ggplot(data, aes(fill=behavior, y=time.min., x=subject)) + 
+    geom_bar(position="stack", stat="identity")
+
+#百分比堆积条形图
+#唯一的变化就是把position的参数切换为“fill”
+ggplot(data, aes(fill=behavior, y=time.min., x=subject)) + 
+geom_bar(position="fill", stat="identity")
+
+
+山脉图用于观察一个连续变量在不同组别中的分布情况。如研究国家级一流本科课程授课教师的课堂师生互动行为特征时，可以用山脉图呈现各学科教师某一课堂互动行为持续时长的分布情况。而堆积条形图用于呈现不同连续变量在不同组别中的分布情况。依旧是上述研究情境，利用堆积条形图可呈现各学科教师实施多种课堂互动行为的持续时长。如果进一步利用堆积条形图的变体——百分比堆积条形图，可以直观地看到各学科教师实施多种课堂互动行为的占比，进而总结其课堂互动模式。

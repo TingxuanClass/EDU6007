@@ -1,0 +1,33 @@
+##1
+library(ggplot2)
+da<- read.csv("C:/Users/tianq/Desktop/2.6.csv",header = T)
+ggplot(da,aes(Mean,CNT,col=SEX))+
+   geom_point(size=6)+
+   geom_errorbar(aes(xmin = Mean - 3*s.e.标准误差, xmax = Mean + 3*s.e.标准误差), 
+   width = 0.4,cex=1)+theme_bw()+theme(legend.position = "top",axis.text.x=element_text(colour="black",family="Times",size=16), #设置x轴刻度标签的字体属性
+   axis.text.y=element_text(family="Times",size=16,face="plain"), #设置x轴刻度标签的字体属性
+   axis.title.y=element_text(family="Times",size = 18,face="plain"), #设置y轴的标题的字体属性
+   axis.title.x=element_text(family="Times",size = 18,face="plain"))
+ggsave(file="C:\\Users\\tianq\\Desktop\\1.png",width=8.38,height =4.5,dpi=100)
+##2
+da<- read.csv("C:/Users/tianq/Desktop/2.61.csv",header = T)
+ggplot(da,aes(Mean,CNTRYID,col=AGEG10LFS))+
+   geom_point(size=6)+
+   geom_errorbar(aes(xmin = Mean - 1*s.e.标准误差, xmax = Mean + 1*s.e.标准误差), 
+   width = 0.4,cex=1)+theme_bw()+theme(legend.position = "top",axis.text.x=element_text(colour="black",family="Times",size=16), #设置x轴刻度标签的字体属性
+   axis.text.y=element_text(family="Times",size=16,face="plain"), #设置x轴刻度标签的字体属性
+   axis.title.y=element_text(family="Times",size = 18,face="plain"), #设置y轴的标题的字体属性
+   axis.title.x=element_text(family="Times",size = 18,face="plain"))
+ggsave(file="C:\\Users\\tianq\\Desktop\\2.png",width=10,height =4.5,dpi=100)
+###3
+library(dplyr)
+da<- read.csv("C:/Users/tianq/Desktop/2.62.csv",header = T)
+ggplot(da, aes(x=CNTRYID)) +
+   geom_bar(da=subset(da,ty=="b")%>%mutate(AGEG10LFS=factor(AGEG10LFS,levels = c("55 plus","45-54","35-44"))), aes(y=Percentage/100, fill=AGEG10LFS), stat="identity") +
+   geom_bar(da=subset(da,ty=="a"), aes(y=-Percentage/100, fill=AGEG10LFS), stat="identity")+coord_flip()+theme_bw()+theme(legend.position = "top",axis.text.x=element_text(colour="black",family="Times",size=16), #设置x轴刻度标签的字体属性
+   axis.text.y=element_text(family="Times",size=16,face="plain"), #设置x轴刻度标签的字体属性
+   axis.title.y=element_text(family="Times",size = 18,face="plain"), #设置y轴的标题的字体属性
+   axis.title.x=element_text(family="Times",size = 18,face="plain"))+
+ylab("Percentage")
+ggsave(file="C:\\Users\\tianq\\Desktop\\3.png",width=10,height =4.5,dpi=100)
+
