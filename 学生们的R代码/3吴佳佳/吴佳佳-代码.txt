@@ -1,0 +1,45 @@
+###download package:forcats, tidyverse
+
+###example-1 use forcats_collapse
+gender<- factor(c("female","male","male","f","m","a"))
+gender
+levels(gender)
+is.factor(gender)
+
+new_gender <- fct_collapse(gender, Female = c("female","f"), 
+Male= c("male","m"),NULL="a")
+
+new_gender
+is.na(new_gender)
+
+###example-2 use tidyverse
+
+head(gss_cat)
+
+gss_cat %>% count(race) ### %>% 表示赋值
+
+race1<- gss_cat$race
+head(race1)
+levels(race1)
+
+new_race <- fct_collapse(race1, white=c("White"),
+notwhite= c("Other","Black","Not applicable"))
+
+new_race
+levels(new_race)
+
+
+###example-3 use fct_reorder
+gss_cat %>% count(marital)
+library(ggplot2)
+gss_cat %>%  
+  count(marital) %>% 
+  ggplot(aes(marital, n)) + 
+  geom_col()
+
+gss_cat %>%  
+  count(marital) %>% 
+  mutate(marital=fct_reorder(marital,n)) %>%  ###排序
+  ggplot(aes(marital,n)) +  ###aes表示映射
+  geom_col()  ###用条形图的高度来表示数据中的值
+
